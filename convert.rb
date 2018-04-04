@@ -27,29 +27,34 @@ begin
       puts "SELECT * FROM #{src_table}"
       results = source_connection.exec("SELECT * FROM #{src_table}")
       results.each do |result|
-        values = []
-        query = "INSERT INTO #{dest_table}("
-        field_keys = tablemap['fields'].keys
-        field_keys.each do |dest_field|
-          values << eval(tablemap['fields'][dest_field])
-          if field_keys.last != dest_field
-            query += "#{dest_field}, "
-          else
-            query += "#{dest_field})"
+        begin
+          values = []
+          query = "INSERT INTO #{dest_table}("
+          field_keys = tablemap['fields'].keys
+          field_keys.each do |dest_field|
+            values << eval(tablemap['fields'][dest_field])
+            if field_keys.last != dest_field
+              query += "#{dest_field}, "
+            else
+              query += "#{dest_field})"
+            end
           end
-        end
-        query += ' VALUES('
-        1.upto(values.count).each do |i|
-          if i != values.count
-            query += "$#{i}, "
-          else
-            query += "$#{i})"
+          query += ' VALUES('
+          1.upto(values.count).each do |i|
+            if i != values.count
+              query += "$#{i}, "
+            else
+              query += "$#{i})"
+            end
           end
+          puts "Query: (#{query}), values: (#{values})"
+          dest_connection.exec_params(query, values)
+        rescue PG::Error => e
+          puts "Encountered PG::Error: #{e.to_s}. Trying next result..."
+          next
         end
-        puts "Query: (#{query}), values: (#{values})"
-        dest_connection.exec_params(query, values)
-        puts "Migrated from #{src_table} to #{dest_table}!"
       end
+      puts "Migrated from #{src_table} to #{dest_table}!"
     rescue PG::Error => e
       puts "Encountered PG::Error: #{e.to_s}. Trying next definition..."
       next
