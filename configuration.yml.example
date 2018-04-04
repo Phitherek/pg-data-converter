@@ -1,0 +1,18 @@
+source:
+  hostname: localhost
+  port: 5432
+  username: user
+  password: pass
+  database: dbname
+destination:
+  hostname: localhost
+  port: 5432
+  username: user
+  password: pass
+  database: dbname
+map:
+  - source_table: tablename
+    destination_table: tablename
+    fields:
+      destination_field: eval # Original table row is available as "result" variable
+      destination_field_2: eval
