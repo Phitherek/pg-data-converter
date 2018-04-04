@@ -3,7 +3,7 @@ require 'yaml'
 
 exit_value = 0
 
-puts 'PostgreSQL data migration tool'
+puts 'PG Data Converter - PostgreSQL data migration tool (C) 2018 Phitherek_'
 
 puts 'Reading config...'
 
