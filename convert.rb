@@ -24,17 +24,19 @@ error_log.puts "--- Conversion started #{Time.now.to_s} ---"
 error_log.flush
 
 begin
-  map_iter = 1
+  map_iter = 0
   map_count = @config['map'].count
   @config['map'].each do |tablemap|
+    map_iter += 1
     begin
       src_table = tablemap['source_table']
       dest_table = tablemap['destination_table']
       puts "(#{map_iter}/#{map_count}) SELECT * FROM #{src_table}"
       results = source_connection.exec("SELECT * FROM #{src_table}")
-      result_iter = 1
+      result_iter = 0
       result_count = results.count
       results.each do |result|
+        result_iter += 1
         begin
           values = []
           query = "INSERT INTO #{dest_table}("
@@ -63,7 +65,6 @@ begin
           error_log.flush
           next
         end
-        result_iter += 1
       end
       puts "(#{map_iter}/#{map_count}) Migrated from #{src_table} to #{dest_table}!"
     rescue PG::Error => e
@@ -72,7 +73,6 @@ begin
       error_log.flush
       next
     end
-    map_iter += 1
   end
 rescue => e
   puts "Encountered exception: #{e.class} - #{e}"
